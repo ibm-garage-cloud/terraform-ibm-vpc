@@ -1,4 +1,4 @@
-vpc "dev_vpc" {
+module "dev_vpc" {
   source = "./module"
 
   resource_group_name = var.resource_group_name

@@ -11,77 +11,41 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   verify:
-    # The type of runner that the job will run on
-    if: "!contains(github.event.commits[0].message, '[skip ci]')"
+    if: ${{ !contains( github.event.pull_request.labels.*.name, 'skip ci' ) }}
     runs-on: ubuntu-latest
-    container: quay.io/ibmgaragecloud/cli-tools:v0.9.0-lite
+    container: quay.io/ibmgaragecloud/cli-tools:v0.10.0-lite
 
     strategy:
       matrix:
-        prefix-name: [garage-module-test]
-        apply: [true, false]
-        public-gateway: [true, false]
-      max-parallel: 1
-      fail-fast: true
+        platform: [ocp4_latest]
+    #      max-parallel: 1
+      fail-fast: false
 
     env:
       HOME: /home/devops
-      TF_VAR_ibmcloud_api_key: ${{ secrets.IBMCLOUD_API_KEY }}
-      IBMCLOUD_API_KEY: ${{ secrets.IBMCLOUD_API_KEY }}
-      TF_VAR_resource_group_name: ${{ secrets.TEST_RESOURCE_GROUP }}
-      TF_VAR_region: ${{ secrets.TEST_REGION }}
-      TF_VAR_name_prefix: ${{ format('{0}-{1}', matrix.prefix-name, matrix.public-gateway) }}
-      TF_VAR_vpc_zone_names: ${{ format('{0}-1,{0}-2,{0}-3', secrets.TEST_REGION) }}
-      TF_VAR_vpc_apply: ${{ matrix.apply }}
-      TF_VAR_vpc_public_gateway: ${{ matrix.public-gateway }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Validate config
-        run: |
-          echo "Github sha: ${{ github.sha }}"
-          echo "Github ref: ${{ github.ref }}"
-
       - name: Checkout
         uses: actions/checkout@v1
 
-      # Sets up the task
-      - name: Setup ${{ format('{0}-{1}-{2}', matrix.prefix-name, matrix.apply, matrix.public-gateway) }}
-        run: |
-          ls -lA
-          mkdir -p /tmp/workspace/module
-          cp -R ./.github/scripts/* /tmp/workspace
-          cp -R ./test/stages/* /tmp/workspace
-          cp -R . /tmp/workspace/module
+      - name: Verify deploy on ${{ matrix.platform }}
+        uses: ibm-garage-cloud/action-module-verify-deploy@main
+        with:
+          clusterId: ${{ matrix.platform }}
+          validateDeployScript: .github/scripts/validate-deploy.sh
+        env:
+          TF_VAR_ibmcloud_api_key: ${{ secrets.IBMCLOUD_API_KEY }}
+          IBMCLOUD_API_KEY: ${{ secrets.IBMCLOUD_API_KEY }}
 
-      # Deploy
-      - name: Deploy ${{ format('{0}-{1}-{2}', matrix.prefix-name, matrix.apply, matrix.public-gateway) }}
-        run: |
-          cd /tmp/workspace
-          ./apply.sh
-
-      # Test deploy
-      - name: Validate deploy ${{ format('{0}-{1}-{2}', matrix.prefix-name, matrix.apply, matrix.public-gateway) }}
-        run: |
-          cd /tmp/workspace
-          if [[ "${TF_VAR_vpc_apply}" == "true" ]]; then
-            ./validate-deploy.sh ${TF_VAR_name_prefix} ${TF_VAR_vpc_public_gateway}
-          else
-            ./validate-notdeploy.sh ${TF_VAR_name_prefix} ${TF_VAR_vpc_public_gateway}
-          fi
-
-      # Destroy
-      - name: Destroy ${{ format('{0}-{1}-{2}', matrix.prefix-name, matrix.apply, matrix.public-gateway) }}
+      - name: Verify destroy on ${{ matrix.platform }}
+        uses: ibm-garage-cloud/action-module-verify-destroy@main
         if: ${{ always() }}
-        run: |
-          cd /tmp/workspace
-          ./destroy.sh
-
-      # Test destroy
-      - name: Validate destroy ${{ format('{0}-{1}-{2}', matrix.prefix-name, matrix.apply, matrix.public-gateway) }}
-        run: |
-          cd /tmp/workspace
-          ./validate-notdeploy.sh ${TF_VAR_name_prefix} ${TF_VAR_vpc_public_gateway}
+        with:
+          clusterId: ${{ matrix.platform }}
+        env:
+          TF_VAR_ibmcloud_api_key: ${{ secrets.IBMCLOUD_API_KEY }}
+          IBMCLOUD_API_KEY: ${{ secrets.IBMCLOUD_API_KEY }}
 
   release:
     #    if: ${{ github.event_name == 'push' }}

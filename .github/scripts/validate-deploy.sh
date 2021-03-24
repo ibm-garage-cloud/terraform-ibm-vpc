@@ -2,6 +2,8 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
+exit 0
+
 PREFIX_NAME="$1"
 PUBLIC_GATEWAY="$2"
 

@@ -9,9 +9,15 @@ variable "region" {
   description = "The IBM Cloud region where the cluster will be/has been installed."
 }
 
+variable "name" {
+  type        = string
+  description = "The name of the vpc instance"
+}
+
 variable "name_prefix" {
   type        = string
   description = "The name of the vpc resource"
+  default     = ""
 }
 
 variable "ibmcloud_api_key" {
@@ -20,10 +26,10 @@ variable "ibmcloud_api_key" {
 }
 
 # VPC Variables
-variable "zone_names" {
-  type        = list(string)
-  description = "List of vpc zones"
-  default     = []
+variable "subnet_count" {
+  type        = number
+  description = "Number of subnets for region"
+  default     = 1
 }
 
 variable "public_gateway" {
@@ -32,8 +38,3 @@ variable "public_gateway" {
   default     = true
 }
 
-variable "apply" {
-  type        = bool
-  description = "Flag indicating that the module should be applied"
-  default     = true
-}

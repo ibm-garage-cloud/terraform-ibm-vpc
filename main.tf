@@ -12,7 +12,7 @@ locals {
   zone_ids         = range(1, var.subnet_count + 1)
   vpc_zone_names   = [ for id in local.zone_ids: "${var.region}-${id}" ]
   prefix_name      = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
-  vpc_name         = var.name != "" ? var.name : "${local.prefix_name}-vpc"
+  vpc_name         = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
   vpc_id           = ibm_is_vpc.vpc.id
   subnet_ids       = ibm_is_subnet.vpc_subnet[*].id
   gateway_ids      = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in local.zone_ids: "" ]

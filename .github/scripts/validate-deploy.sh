@@ -2,14 +2,14 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
-source terraform.tfvars
-
-PREFIX_NAME="${prefix_name}"
-PUBLIC_GATEWAY="${public_gateway}"
+PREFIX_NAME=$(cat terraform.tfvars | grep prefix_name | sed "s/prefix_name=//g" | sed 's/"//g')
+PUBLIC_GATEWAY=$(cat terraform.tfvars | grep public_gateway | sed "s/public_gateway=//g" | sed 's/"//g')
+REGION=$(cat terraform.tfvars | grep region | sed "s/region=//g" | sed 's/"//g')
+RESOURCE_GROUP_NAME=$(cat terraform.tfvars | grep resource_group_name | sed "s/resource_group_name=//g" | sed 's/"//g')
 
 VPC_NAME="${PREFIX_NAME}-vpc"
 
-ibmcloud login -r "${region}" -g "${resource_group_name}" --apikey "${ibmcloud_api_key}"
+ibmcloud login -r "${REGION}" -g "${RESOURCE_GROUP_NAME}" --apikey "${IBMCLOUD_API_KEY}"
 
 echo "Retrieving VPC_ID for name: ${VPC_NAME}"
 VPC_ID=$(ibmcloud is vpcs | grep "${VPC_NAME}" | sed -E "s/^([A-Za-z0-9-]+).*/\1/g")

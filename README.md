@@ -31,7 +31,7 @@ None
 ## Example usage
 
 ```hcl-terraform
-vpc "dev_vpc" {
+module "dev_vpc" {
   source = "github.com/cloud-native-toolkit/terraform-ibm-vpc.git?ref=v1.1.0"
 
   resource_group_name = var.resource_group_name

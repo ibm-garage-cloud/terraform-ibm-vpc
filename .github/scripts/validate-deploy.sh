@@ -2,14 +2,14 @@
 
 SCRIPT_DIR=$(cd $(dirname "$0"); pwd -P)
 
-exit 0
+source terraform.tfvars
 
-PREFIX_NAME="$1"
-PUBLIC_GATEWAY="$2"
+PREFIX_NAME="${prefix_name}"
+PUBLIC_GATEWAY="${public_gateway}"
 
 VPC_NAME="${PREFIX_NAME}-vpc"
 
-ibmcloud login -r "${TF_VAR_region}" -g "${TF_VAR_resource_group_name}" --apikey "${TF_VAR_ibmcloud_api_key}"
+ibmcloud login -r "${region}" -g "${resource_group_name}" --apikey "${ibmcloud_api_key}"
 
 echo "Retrieving VPC_ID for name: ${VPC_NAME}"
 VPC_ID=$(ibmcloud is vpcs | grep "${VPC_NAME}" | sed -E "s/^([A-Za-z0-9-]+).*/\1/g")

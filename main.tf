@@ -1,11 +1,7 @@
 provider "ibm" {
-  generation = 2
-  version = ">= 1.8.1"
-  region = var.region
-}
-provider "null" {
-}
-provider "local" {
+  generation       = 2
+  region           = var.region
+  ibmcloud_api_key = var.ibmcloud_api_key
 }
 
 locals {

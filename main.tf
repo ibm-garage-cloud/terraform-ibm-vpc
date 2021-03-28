@@ -5,13 +5,14 @@ provider "ibm" {
 }
 
 locals {
-  zone_ids         = range(0, var.subnet_count)
-  vpc_zone_names   = [ for index in local.zone_ids: "${var.region}-${(index % 3) + 1}" ]
+  zone_count       = 3
+  zone_ids         = range(var.subnet_count)
+  vpc_zone_names   = [ for index in local.zone_ids: "${var.region}-${(index % local.zone_count) + 1}" ]
   prefix_name      = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
   vpc_name         = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
   vpc_id           = ibm_is_vpc.vpc.id
   subnet_ids       = ibm_is_subnet.vpc_subnet[*].id
-  gateway_ids      = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in local.zone_ids: "" ]
+  gateway_ids      = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in range(local.zone_count): "" ]
   security_group   = ibm_is_vpc.vpc.default_security_group
   ipv4_cidr_blocks = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
 }
@@ -26,7 +27,7 @@ resource ibm_is_vpc vpc {
 }
 
 resource ibm_is_public_gateway vpc_gateway {
-  count = var.public_gateway ? var.subnet_count : 0
+  count = var.public_gateway ? min(local.zone_count, var.subnet_count) : 0
 
   name           = "${local.vpc_name}-gateway-${format("%02s", count.index)}"
   vpc            = local.vpc_id
@@ -66,7 +67,7 @@ resource ibm_is_subnet vpc_subnet {
   name                     = "${local.vpc_name}-subnet-${format("%02s", count.index)}"
   zone                     = local.vpc_zone_names[count.index]
   vpc                      = local.vpc_id
-  public_gateway           = local.gateway_ids[count.index]
+  public_gateway           = local.gateway_ids[count.index % local.zone_count]
   total_ipv4_address_count = 256
   resource_group           = data.ibm_resource_group.resource_group.id
   network_acl              = ibm_is_network_acl.network_acl.id

@@ -5,8 +5,8 @@ provider "ibm" {
 }
 
 locals {
-  zone_ids         = range(1, var.subnet_count + 1)
-  vpc_zone_names   = [ for id in local.zone_ids: "${var.region}-${id}" ]
+  zone_ids         = range(0, var.subnet_count)
+  vpc_zone_names   = [ for index in local.zone_ids: "${var.region}-${(index % 3) + 1}" ]
   prefix_name      = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
   vpc_name         = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
   vpc_id           = ibm_is_vpc.vpc.id

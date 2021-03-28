@@ -39,6 +39,7 @@ if ! ibmcloud is vpc "${VPC_ID}"; then
 fi
 
 echo "Retrieving VPC subnets for VPC: ${VPC_NAME}"
+ibmcloud is subnets | grep "${VPC_NAME}"
 SUBNETS=$(ibmcloud is subnets | grep "${VPC_NAME}")
 
 if [[ -z "${SUBNETS}" ]]; then

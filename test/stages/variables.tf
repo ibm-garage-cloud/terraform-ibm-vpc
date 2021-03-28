@@ -37,3 +37,9 @@ variable "vpc_public_gateway" {
   description = "Flag indicating the public gateway should be created"
   default     = "true"
 }
+
+variable "vpc_subnet_count" {
+  type        = number
+  description = "The number of subnets to create for the VPC instance"
+  default     = 6
+}

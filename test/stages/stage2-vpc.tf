@@ -5,6 +5,6 @@ module "dev_vpc" {
   region              = var.region
   name_prefix         = var.name_prefix
   ibmcloud_api_key    = var.ibmcloud_api_key
-  subnet_count        = 1
+  subnet_count        = var.vpc_subnet_count
   public_gateway      = var.vpc_public_gateway == "true"
 }

@@ -1,8 +1,3 @@
-provider "ibm" {
-  generation       = 2
-  region           = var.region
-  ibmcloud_api_key = var.ibmcloud_api_key
-}
 
 locals {
   zone_count       = 3
@@ -17,7 +12,15 @@ locals {
   ipv4_cidr_blocks = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
 }
 
+resource null_resource print_names {
+  provisioner "local-exec" {
+    command = "echo 'Resource group: ${var.resource_group_name}'"
+  }
+}
+
 data ibm_resource_group resource_group {
+  depends_on = [null_resource.print_names]
+
   name = var.resource_group_name
 }
 

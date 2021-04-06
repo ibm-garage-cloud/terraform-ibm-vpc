@@ -8,7 +8,7 @@ locals {
   vpc_id           = ibm_is_vpc.vpc.id
   subnet_ids       = ibm_is_subnet.vpc_subnet[*].id
   gateway_ids      = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in range(local.zone_count): "" ]
-  security_group   = ibm_is_vpc.vpc.default_security_group
+  security_group   = ibm_is_security_group.security_group
   ipv4_cidr_blocks = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
 }
 
@@ -26,6 +26,12 @@ data ibm_resource_group resource_group {
 
 resource ibm_is_vpc vpc {
   name           = local.vpc_name
+  resource_group = data.ibm_resource_group.resource_group.id
+}
+
+resource ibm_is_security_group security_group {
+  name           = "${local.vpc_name}-security-group"
+  vpc            = ibm_is_vpc.vpc.id
   resource_group = data.ibm_resource_group.resource_group.id
 }
 
@@ -90,7 +96,7 @@ resource ibm_is_security_group_rule rule_tcp_k8s {
 }
 
 resource ibm_is_security_group_rule rule_icmp_ping {
-  group     = ibm_is_vpc.vpc.default_security_group
+  group     = local.security_group
   direction = "inbound"
   remote    = "0.0.0.0/0"
   icmp {
@@ -100,7 +106,7 @@ resource ibm_is_security_group_rule rule_icmp_ping {
 
 # from https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
 resource ibm_is_security_group_rule "cse_dns_1" {
-  group     = ibm_is_vpc.vpc.default_security_group
+  group     = local.security_group
   direction = "outbound"
   remote    = "161.26.0.10"
   udp {
@@ -110,7 +116,7 @@ resource ibm_is_security_group_rule "cse_dns_1" {
 }
 
 resource ibm_is_security_group_rule cse_dns_2 {
-  group     = ibm_is_vpc.vpc.default_security_group
+  group     = local.security_group
   direction = "outbound"
   remote    = "161.26.0.11"
   udp {
@@ -120,7 +126,7 @@ resource ibm_is_security_group_rule cse_dns_2 {
 }
 
 resource ibm_is_security_group_rule private_dns_1 {
-  group     = ibm_is_vpc.vpc.default_security_group
+  group     = local.security_group
   direction = "outbound"
   remote    = "161.26.0.7"
   udp {
@@ -130,7 +136,7 @@ resource ibm_is_security_group_rule private_dns_1 {
 }
 
 resource ibm_is_security_group_rule private_dns_2 {
-  group     = ibm_is_vpc.vpc.default_security_group
+  group     = local.security_group
   direction = "outbound"
   remote    = "161.26.0.8"
   udp {

@@ -34,7 +34,13 @@ output "subnet_ids" {
 }
 
 output "subnets" {
-  value       = local.subnets
+  value       = [
+    for subnet in ibm_is_subnet.vpc_subnet:
+    {
+      id    = subnet.id
+      label = local.subnets[index(ibm_is_subnet.vpc_subnet, subnet)].label
+    }
+  ]
   depends_on  = [ibm_is_subnet.vpc_subnet]
   description = "List of subnet objects that contain the subnet id and label, e.g. [{label='', id=''}]"
 }

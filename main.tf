@@ -8,7 +8,7 @@ locals {
   vpc_id            = ibm_is_vpc.vpc.id
   subnet_ids        = ibm_is_subnet.vpc_subnet[*].id
   gateway_ids       = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in range(local.zone_count): "" ]
-  security_group_id = ibm_is_security_group.security_group.id
+  security_group_id = ibm_is_vpc.vpc.default_security_group
   ipv4_cidr_blocks  = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
 }
 
@@ -25,14 +25,9 @@ data ibm_resource_group resource_group {
 }
 
 resource ibm_is_vpc vpc {
-  name           = local.vpc_name
-  resource_group = data.ibm_resource_group.resource_group.id
-}
-
-resource ibm_is_security_group security_group {
-  name           = "${local.vpc_name}-security-group"
-  vpc            = ibm_is_vpc.vpc.id
-  resource_group = data.ibm_resource_group.resource_group.id
+  name                        = local.vpc_name
+  resource_group              = data.ibm_resource_group.resource_group.id
+  default_security_group_name = "${local.vpc_name}-security-group"
 }
 
 resource ibm_is_public_gateway vpc_gateway {

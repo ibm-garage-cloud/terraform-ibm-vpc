@@ -1,7 +1,8 @@
 
 locals {
   zone_count        = 3
-  zone_ids          = range(var.subnet_count)
+  subnet_count      = length(var.subnets)
+  zone_ids          = range(local.subnet_count)
   vpc_zone_names    = [ for index in local.zone_ids: "${var.region}-${(index % local.zone_count) + 1}" ]
   prefix_name       = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
   vpc_name          = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
@@ -10,6 +11,19 @@ locals {
   gateway_ids       = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in range(local.zone_count): "" ]
   security_group_id = ibm_is_vpc.vpc.default_security_group
   ipv4_cidr_blocks  = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
+  # creates an intermediate object where the key is the label and the value is an array of labels, one for each appearance
+  # e.g. [{label = "default"}, {label = "default"}, {label = "test"}] would yield {default = ["default", "default"], test = ["test"]}
+  subnet_labels_tmp = {for val in var.subnets: val.label => val.label...}
+  # creates an object where the key is the label and the value is number of times the label appears in the original list
+  # e.g. {default = ["default", "default"], test = ["test"]} would yield {default = 2, test = 1}
+  subnet_label_count = {for val in local.subnet_labels_tmp: val => length(local.subnet_labels_tmp[val])}
+  subnets           = [
+    for subnet in ibm_is_subnet.vpc_subnet:
+      {
+        id    = subnet.id
+        label = var.subnets[index(ibm_is_subnet.vpc_subnet, subnet)].label
+      }
+  ]
 }
 
 resource null_resource print_names {
@@ -31,7 +45,7 @@ resource ibm_is_vpc vpc {
 }
 
 resource ibm_is_public_gateway vpc_gateway {
-  count = var.public_gateway ? min(local.zone_count, var.subnet_count) : 0
+  count = var.public_gateway ? min(local.zone_count, local.subnet_count) : 0
 
   name           = "${local.vpc_name}-gateway-${format("%02s", count.index)}"
   vpc            = local.vpc_id
@@ -66,7 +80,7 @@ resource ibm_is_network_acl network_acl {
 }
 
 resource ibm_is_subnet vpc_subnet {
-  count                    = var.subnet_count
+  count                    = local.subnet_count
 
   name                     = "${local.vpc_name}-subnet-${format("%02s", count.index)}"
   zone                     = local.vpc_zone_names[count.index]
@@ -78,7 +92,7 @@ resource ibm_is_subnet vpc_subnet {
 }
 
 resource ibm_is_security_group_rule rule_tcp_k8s {
-  count     = var.subnet_count
+  count     = local.subnet_count
 
   group     = local.security_group_id
   direction = "inbound"

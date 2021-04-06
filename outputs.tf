@@ -12,7 +12,7 @@ output "id" {
 }
 
 output "subnet_count" {
-  value       = length(var.subnets)
+  value       = local.subnet_count
   description = "The total number of subnets for the vpc"
 }
 

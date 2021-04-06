@@ -27,6 +27,12 @@ variable "ibmcloud_api_key" {
 }
 
 # VPC Variables
+variable "subnet_count" {
+  type        = number
+  description = "(Deprecated) Number of subnets to create"
+  default     = 0
+}
+
 variable "subnets" {
   type        = list(object({
     label = string

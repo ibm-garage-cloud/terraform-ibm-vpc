@@ -1,15 +1,15 @@
 
 locals {
-  zone_count       = 3
-  zone_ids         = range(var.subnet_count)
-  vpc_zone_names   = [ for index in local.zone_ids: "${var.region}-${(index % local.zone_count) + 1}" ]
-  prefix_name      = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
-  vpc_name         = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
-  vpc_id           = ibm_is_vpc.vpc.id
-  subnet_ids       = ibm_is_subnet.vpc_subnet[*].id
-  gateway_ids      = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in range(local.zone_count): "" ]
-  security_group   = ibm_is_security_group.security_group
-  ipv4_cidr_blocks = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
+  zone_count        = 3
+  zone_ids          = range(var.subnet_count)
+  vpc_zone_names    = [ for index in local.zone_ids: "${var.region}-${(index % local.zone_count) + 1}" ]
+  prefix_name       = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
+  vpc_name          = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
+  vpc_id            = ibm_is_vpc.vpc.id
+  subnet_ids        = ibm_is_subnet.vpc_subnet[*].id
+  gateway_ids       = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in range(local.zone_count): "" ]
+  security_group_id = ibm_is_security_group.security_group.id
+  ipv4_cidr_blocks  = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
 }
 
 resource null_resource print_names {
@@ -85,7 +85,7 @@ resource ibm_is_subnet vpc_subnet {
 resource ibm_is_security_group_rule rule_tcp_k8s {
   count     = var.subnet_count
 
-  group     = local.security_group
+  group     = local.security_group_id
   direction = "inbound"
   remote    = local.ipv4_cidr_blocks[count.index]
 
@@ -96,7 +96,7 @@ resource ibm_is_security_group_rule rule_tcp_k8s {
 }
 
 resource ibm_is_security_group_rule rule_icmp_ping {
-  group     = local.security_group
+  group     = local.security_group_id
   direction = "inbound"
   remote    = "0.0.0.0/0"
   icmp {
@@ -106,7 +106,7 @@ resource ibm_is_security_group_rule rule_icmp_ping {
 
 # from https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
 resource ibm_is_security_group_rule "cse_dns_1" {
-  group     = local.security_group
+  group     = local.security_group_id
   direction = "outbound"
   remote    = "161.26.0.10"
   udp {
@@ -116,7 +116,7 @@ resource ibm_is_security_group_rule "cse_dns_1" {
 }
 
 resource ibm_is_security_group_rule cse_dns_2 {
-  group     = local.security_group
+  group     = local.security_group_id
   direction = "outbound"
   remote    = "161.26.0.11"
   udp {
@@ -126,7 +126,7 @@ resource ibm_is_security_group_rule cse_dns_2 {
 }
 
 resource ibm_is_security_group_rule private_dns_1 {
-  group     = local.security_group
+  group     = local.security_group_id
   direction = "outbound"
   remote    = "161.26.0.7"
   udp {
@@ -136,7 +136,7 @@ resource ibm_is_security_group_rule private_dns_1 {
 }
 
 resource ibm_is_security_group_rule private_dns_2 {
-  group     = local.security_group
+  group     = local.security_group_id
   direction = "outbound"
   remote    = "161.26.0.8"
   udp {

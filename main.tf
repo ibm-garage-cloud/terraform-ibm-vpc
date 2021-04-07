@@ -44,7 +44,7 @@ data ibm_resource_group resource_group {
 resource ibm_is_vpc vpc {
   name                        = local.vpc_name
   resource_group              = data.ibm_resource_group.resource_group.id
-  default_security_group_name = "${local.vpc_name}-security-group"
+//  default_security_group_name = "${local.vpc_name}-security-group"
 }
 
 resource ibm_is_public_gateway vpc_gateway {

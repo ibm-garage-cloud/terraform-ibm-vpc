@@ -39,7 +39,7 @@ output "subnets" {
     {
       id    = subnet.id
       zone  = subnet.zone
-      label = length(var.subnets) > 0 ? var.subnets[index(ibm_is_subnet.vpc_subnet, subnet)].label : "default"
+      label = length(var.subnets) > 0 ? matchkeys(var.subnets, data.ibm_is_subnet.vpc_subnet, subnet) : "default"
     }
   ]
   depends_on  = [ibm_is_subnet.vpc_subnet]

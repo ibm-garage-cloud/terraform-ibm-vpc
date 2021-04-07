@@ -38,9 +38,7 @@ variable "subnets" {
     label = string
   }))
   description = "The labeled subnets that should be created. Each entry in the list represents a different subnet"
-  default     = [{
-    label = "default"
-  }]
+  default     = []
 }
 
 variable "public_gateway" {

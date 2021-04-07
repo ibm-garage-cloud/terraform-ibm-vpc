@@ -27,6 +27,6 @@ versions:
     - name: subnet_count
       scope: ignore
     - name: subnets
-      scope: global
+      scope: module
     - name: public_gateway
       scope: module

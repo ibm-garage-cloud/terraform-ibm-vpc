@@ -41,5 +41,11 @@ variable "vpc_public_gateway" {
 variable "vpc_subnet_count" {
   type        = number
   description = "The number of subnets to create for the VPC instance"
-  default     = 6
+  default     = 0
+}
+
+variable "vpc_subnets" {
+  type        = string
+  description = "JSON representation of list of object, e.g. [{\"label\"=\"default\"}]"
+  default     = "[]"
 }

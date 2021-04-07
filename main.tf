@@ -94,6 +94,12 @@ resource ibm_is_subnet vpc_subnet {
   network_acl              = ibm_is_network_acl.network_acl.id
 }
 
+data ibm_is_subnet vpc_subnet {
+  count      = local.subnet_count
+
+  identifier = ibm_is_subnet.vpc_subnet[count.index].id
+}
+
 resource ibm_is_security_group_rule rule_tcp_k8s {
   count     = local.subnet_count
 

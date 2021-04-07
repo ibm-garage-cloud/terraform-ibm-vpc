@@ -17,8 +17,15 @@ locals {
   # creates an object where the key is the label and the value is number of times the label appears in the original list
   # e.g. {basic = ["basic", "basic"], test = ["test"]} would yield {basic = 2, test = 1}
   subnet_label_counts = length(var.subnets) > 0
-    ? [ for val in local.distinct_subnet_labels: { label = val, count = length(local.subnet_labels_tmp[val]) } ]
-    : [ { label = "default", count = local.subnet_count } ]
+    ? [ for val in local.distinct_subnet_labels:
+        {
+          label = val
+          count = length(local.subnet_labels_tmp[val])
+        } ]
+    : [ {
+          label = "default"
+          count = local.subnet_count
+      } ]
 }
 
 resource null_resource print_names {

@@ -2,7 +2,6 @@
 locals {
   zone_count        = 3
   subnet_count      = length(var.subnets) > 0 ? length(var.subnets) : var.subnet_count
-  subnets           = length(var.subnets) > 0 ? var.subnets : [for x in range(local.subnet_count): {label = "default"}]
   zone_ids          = range(local.subnet_count)
   vpc_zone_names    = [ for index in local.zone_ids: "${var.region}-${(index % local.zone_count) + 1}" ]
   prefix_name       = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
@@ -14,7 +13,7 @@ locals {
   ipv4_cidr_blocks  = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
   # creates an intermediate object where the key is the label and the value is an array of labels, one for each appearance
   # e.g. [{label = "default"}, {label = "default"}, {label = "test"}] would yield {default = ["default", "default"], test = ["test"]}
-  subnet_labels_tmp = {for val in local.subnets: val.label => val.label...}
+  subnet_labels_tmp = length(var.subnets) > 0 ? {for val in var.subnets: val.label => val.label...} : {default = range(local.subnet_count) }
   # creates an object where the key is the label and the value is number of times the label appears in the original list
   # e.g. {default = ["default", "default"], test = ["test"]} would yield {default = 2, test = 1}
   subnet_label_count = {for val in local.subnet_labels_tmp: val => length(local.subnet_labels_tmp[val])}

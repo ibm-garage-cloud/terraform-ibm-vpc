@@ -16,9 +16,9 @@ output "subnet_count" {
   description = "The total number of subnets for the vpc"
 }
 
-output "subnet_label_count" {
-  value       = local.subnet_label_count
-  description = "The number of subnets for each label. e.g. {default = 2, test = 1}"
+output "subnet_label_counts" {
+  value       = local.subnet_label_counts
+  description = "The number of subnets for each label. e.g. [{label = 'default', count = 2}, {label = 'test', count = 1}]"
 }
 
 output "zone_names" {

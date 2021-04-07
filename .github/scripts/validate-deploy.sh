@@ -59,4 +59,7 @@ elif [[ "${PUBLIC_GATEWAY}" == "false" ]] && [[ -n "${PGS}" ]]; then
   exit 1
 fi
 
+cat "./subnet_label_counts.json" | jq '.'
+cat "./subnets.json" | jq '.'
+
 exit 0

@@ -10,12 +10,13 @@ locals {
   gateway_ids       = var.public_gateway ? ibm_is_public_gateway.vpc_gateway[*].id : [ for val in range(local.zone_count): "" ]
   security_group_id = ibm_is_vpc.vpc.default_security_group
   ipv4_cidr_blocks  = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
+  distinct_subnet_labels = distinct([ for val in var.subnets: val.label ])
   # creates an intermediate object where the key is the label and the value is an array of labels, one for each appearance
   # e.g. [{label = "basic"}, {label = "basic"}, {label = "test"}] would yield {basic = ["basic", "basic"], test = ["test"]}
   subnet_labels_tmp = { for subnet in var.subnets: subnet.label => subnet.label... }
   # creates an object where the key is the label and the value is number of times the label appears in the original list
   # e.g. {basic = ["basic", "basic"], test = ["test"]} would yield {basic = 2, test = 1}
-  subnet_label_count = { for val in local.subnet_labels_tmp: val => length(local.subnet_labels_tmp[val]) }
+  subnet_label_count = { for val in local.distinct_subnet_labels: val => length(local.subnet_labels_tmp[val]) }
 }
 
 resource null_resource print_names {

@@ -11,16 +11,19 @@ locals {
   security_group_id = ibm_is_vpc.vpc.default_security_group
   ipv4_cidr_blocks  = ibm_is_subnet.vpc_subnet[*].ipv4_cidr_block
   # creates an intermediate object where the key is the label and the value is an array of labels, one for each appearance
-  # e.g. [{label = "default"}, {label = "default"}, {label = "test"}] would yield {default = ["default", "default"], test = ["test"]}
+  # e.g. [{label = "basic"}, {label = "basic"}, {label = "test"}] would yield {basic = ["basic", "basic"], test = ["test"]}
   subnet_labels_tmp = { for subnet in var.subnets: subnet.label => subnet.label... }
   # creates an object where the key is the label and the value is number of times the label appears in the original list
-  # e.g. {default = ["default", "default"], test = ["test"]} would yield {default = 2, test = 1}
-  subnet_label_count = length(var.subnets) > 0 ? {for val in local.subnet_labels_tmp: val => length(local.subnet_labels_tmp[val])} : {default = local.subnet_count}
+  # e.g. {basic = ["basic", "basic"], test = ["test"]} would yield {basic = 2, test = 1}
+  subnet_label_count = length(var.subnets) > 0 ? { for val in local.subnet_labels_tmp: val => length(local.subnet_labels_tmp[val]) } : { basic = local.subnet_count }
 }
 
 resource null_resource print_names {
   provisioner "local-exec" {
     command = "echo 'Resource group: ${var.resource_group_name}'"
+  }
+  provisioner "local-exec" {
+    command = "echo 'Subnets: ${jsonencode(local.subnet_labels_tmp)}'"
   }
 }
 

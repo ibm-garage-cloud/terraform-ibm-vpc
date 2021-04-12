@@ -29,25 +29,3 @@ variable "ibmcloud_api_key" {
   type        = string
   description = "The IBM Cloud api token"
 }
-
-# VPC Variables
-variable "subnet_count" {
-  type        = number
-  description = "(Deprecated) Number of subnets to create"
-  default     = 0
-}
-
-variable "subnets" {
-  type        = list(object({
-    label = string
-  }))
-  description = "The labeled subnets that should be created. Each entry in the list represents a different subnet"
-  default     = []
-}
-
-variable "public_gateway" {
-  type        = bool
-  description = "Flag indicating that a public gateway should be created"
-  default     = true
-}
-

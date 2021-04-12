@@ -1,7 +1,7 @@
 # Resource Group Variables
-variable "resource_group_name" {
+variable "resource_group_id" {
   type        = string
-  description = "The name of the IBM Cloud resource group where the cluster will be created/can be found."
+  description = "The id of the IBM Cloud resource group where the cluster will be created/can be found."
 }
 
 variable "region" {

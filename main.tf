@@ -5,28 +5,16 @@ locals {
   vpc_id            = ibm_is_vpc.vpc.id
 }
 
-resource null_resource print_names {
-  provisioner "local-exec" {
-    command = "echo 'Resource group: ${var.resource_group_name}'"
-  }
-}
-
-data ibm_resource_group resource_group {
-  depends_on = [null_resource.print_names]
-
-  name = var.resource_group_name
-}
-
 resource ibm_is_vpc vpc {
   name                        = local.vpc_name
-  resource_group              = data.ibm_resource_group.resource_group.id
+  resource_group              = var.resource_group_id
   default_security_group_name = "${local.vpc_name}-security-group"
 }
 
 resource ibm_is_network_acl network_acl {
   name           = "${local.vpc_name}-acl"
   vpc            = ibm_is_vpc.vpc.id
-  resource_group = data.ibm_resource_group.resource_group.id
+  resource_group = var.resource_group_id
 
   rules {
     name        = "egress"

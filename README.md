@@ -3,11 +3,8 @@
 Provisions a VPC instance and related resources. The full list of resources provisioned is as follows:
 
 - VPC instance
-- VPC public gateway (if `public_gateway` is `true`)
 - VPC network acl
-- VPC subnet (number of instances based on `subnet_count`)
 - VPC security group rules
-    - *k8s* - tcp ports `30000`-`32767`
     - *ping* - icmp type 8
     - *public dns* - `161.26.0.10` and `161.26.0.11`
     - *private dns* - `161.26.0.7` and `161.26.0.8`
@@ -18,27 +15,26 @@ The module depends on the following software components:
 
 ### Command-line tools
 
-- terraform - v12
+- terraform - v13
 
 ### Terraform providers
 
-- IBM Cloud provider >= 1.8.1
+- IBM Cloud provider >= 1.22.0
 
 ## Module dependencies
 
-None
+- Resource group - github.com/cloud-native-toolkit/terraform-ibm-resource-group.git
 
 ## Example usage
 
 ```hcl-terraform
 module "dev_vpc" {
-  source = "github.com/cloud-native-toolkit/terraform-ibm-vpc.git?ref=v1.1.0"
-
-  resource_group_name = var.resource_group_name
+  source = "github.com/cloud-native-toolkit/terraform-ibm-vpc.git"
+  
+  resource_group_id   = module.resource_group.id
+  resource_group_name = module.resource_group.name
   region              = var.region
   name_prefix         = var.name_prefix
   ibmcloud_api_key    = var.ibmcloud_api_key
-  subnet_count        = var.vpc_subnet_count
-  public_gateway      = var.vpc_public_gateway == "true"
 }
 ```

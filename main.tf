@@ -4,6 +4,7 @@ locals {
   vpc_name          = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
   vpc_id            = ibm_is_vpc.vpc.id
   security_group_id = ibm_is_vpc.vpc.default_security_group
+  crn               = ibm_is_vpc.vpc.resource_crn
 }
 
 resource ibm_is_vpc vpc {

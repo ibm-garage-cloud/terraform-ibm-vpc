@@ -15,3 +15,9 @@ output "acl_id" {
   value       = ibm_is_network_acl.network_acl.id
   description = "The id of the network acl"
 }
+
+output "crn" {
+  value       = local.crn
+  depends_on  = [ibm_is_vpc.vpc]
+  description = "The CRN for the vpc instance"
+}

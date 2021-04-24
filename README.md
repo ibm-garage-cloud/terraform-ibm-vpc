@@ -5,9 +5,9 @@ Provisions a VPC instance and related resources. The full list of resources prov
 - VPC instance
 - VPC network acl
 - VPC security group rules
-    - *ping* - icmp type 8
-    - *public dns* - `161.26.0.10` and `161.26.0.11`
-    - *private dns* - `161.26.0.7` and `161.26.0.8`
+  - *ping* - icmp type 8
+  - *public dns* - `161.26.0.10` and `161.26.0.11`
+  - *private dns* - `161.26.0.7` and `161.26.0.8`
 
 ## Software dependencies
 
@@ -29,7 +29,7 @@ The module depends on the following software components:
 
 ```hcl-terraform
 module "dev_vpc" {
-  source = "github.com/cloud-native-toolkit/terraform-ibm-vpc.git"
+  source = "github.com/cloud-native-toolkit/terraform-ibm-vpc.git?ref=v1.7.2"
   
   resource_group_id   = module.resource_group.id
   resource_group_name = module.resource_group.name

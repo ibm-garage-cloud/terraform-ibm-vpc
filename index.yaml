@@ -45,6 +45,55 @@ versions:
         scope: global
         type: string
         description: The IBM Cloud api token
+    version: v1.7.3
+    outputs:
+      - name: name
+        description: The name of the vpc instance
+      - name: id
+        description: The id of the vpc instance
+      - name: acl_id
+        description: The id of the network acl
+      - name: crn
+        description: The CRN for the vpc instance
+  - platforms: []
+    dependencies:
+      - id: resource-group
+        refs:
+          - source: github.com/cloud-native-toolkit/terraform-ibm-resource-group
+            version: ">= 2.1.0"
+    variables:
+      - name: resource_group_id
+        moduleRef:
+          id: resource-group
+          output: id
+        type: string
+        description: The id of the IBM Cloud resource group where the VPC instance will be created.
+      - name: resource_group_name
+        moduleRef:
+          id: resource-group
+          output: name
+        type: string
+        description: The name of the IBM Cloud resource group where the VPC instance will be created.
+      - name: region
+        scope: global
+        type: string
+        description: The IBM Cloud region where the cluster will be/has been installed.
+      - name: name
+        scope: module
+        type: string
+        description: The name of the vpc instance
+        default: ""
+        optional: true
+      - name: name_prefix
+        scope: global
+        type: string
+        description: The name of the vpc resource
+        default: ""
+        optional: true
+      - name: ibmcloud_api_key
+        scope: global
+        type: string
+        description: The IBM Cloud api token
     version: v1.7.2
     outputs:
       - name: name

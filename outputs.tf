@@ -12,7 +12,7 @@ output "id" {
 }
 
 output "acl_id" {
-  value       = ibm_is_network_acl.network_acl.id
+  value       = local.acl_id
   description = "The id of the network acl"
 }
 

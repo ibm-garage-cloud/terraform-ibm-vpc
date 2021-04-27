@@ -11,7 +11,8 @@ locals {
 resource ibm_is_network_acl network_acl {
   count      = var.provision ? 1 : 0
 
-  name       = "${local.vpc_name}-acl"
+  name           = "${local.vpc_name}-acl"
+  resource_group = var.resource_group_id
 
   rules {
     name        = "egress"

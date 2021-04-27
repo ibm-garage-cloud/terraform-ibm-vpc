@@ -9,7 +9,6 @@ locals {
 }
 
 resource ibm_is_network_acl network_acl {
-  depends_on = [ibm_is_vpc.vpc]
   count      = var.provision ? 1 : 0
 
   name       = "${local.vpc_name}-acl"

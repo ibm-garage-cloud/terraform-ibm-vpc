@@ -8,28 +8,11 @@ locals {
   crn               = data.ibm_is_vpc.vpc.resource_crn
 }
 
-resource ibm_is_vpc vpc {
-  count = var.provision ? 1 : 0
-
-  name                        = local.vpc_name
-  resource_group              = var.resource_group_id
-  default_security_group_name = "${local.vpc_name}-security-group"
-  default_network_acl_name    = "${local.vpc_name}-acl"
-  default_routing_table_name  = "${local.vpc_name}-routing"
-}
-
-data ibm_is_vpc vpc {
-  depends_on = [ibm_is_vpc.vpc]
-
-  name = local.vpc_name
-}
-
 resource ibm_is_network_acl network_acl {
   depends_on = [ibm_is_vpc.vpc]
   count      = var.provision ? 1 : 0
 
   name       = "${local.vpc_name}-acl"
-  vpc        = local.vpc_id
 
   rules {
     name        = "egress"
@@ -45,6 +28,22 @@ resource ibm_is_network_acl network_acl {
     destination = "0.0.0.0/0"
     direction   = "inbound"
   }
+}
+
+resource ibm_is_vpc vpc {
+  count = var.provision ? 1 : 0
+
+  name                        = local.vpc_name
+  resource_group              = var.resource_group_id
+  default_security_group_name = "${local.vpc_name}-security-group"
+  default_network_acl         = ibm_is_network_acl.network_acl[0].id
+  default_routing_table_name  = "${local.vpc_name}-routing"
+}
+
+data ibm_is_vpc vpc {
+  depends_on = [ibm_is_vpc.vpc]
+
+  name = local.vpc_name
 }
 
 resource ibm_is_security_group_rule rule_icmp_ping {

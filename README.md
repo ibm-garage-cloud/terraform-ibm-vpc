@@ -38,3 +38,33 @@ module "dev_vpc" {
   ibmcloud_api_key    = var.ibmcloud_api_key
 }
 ```
+
+## Supporting resources
+
+### delete-vpc.sh
+
+Cleaning up a VPC instance can be difficult because the resources need to be removed in a particular order. Running a `terraform delete` from the terraform state that provisioned the VPC instance is the most reliable way to clean up the resources. However, if the terraform state gets corrupted or lost or the VPC resources were provisioned by hand then an alternative approach is required. In order to address this issue, a script has been provided in [scripts/delete-vpc.sh](./scripts/delete-vpc.sh).
+
+#### Prerequisites
+
+##### Software
+
+The `delete-vpc.sh` script has the following software requirements:
+
+- ibmcloud cli - https://cloud.ibm.com/docs/cli?topic=cli-install-ibmcloud-cli
+- ibmcloud vpc infrastructure (is) plugin - https://cloud.ibm.com/docs/cli?topic=vpc-infrastructure-cli-plugin-vpc-reference
+- `jq` cli - https://stedolan.github.io/jq/download/
+
+##### Environment
+
+The `delete-vpc.sh` script assumes that you have already logged into the IBM Cloud account where the VPC resources have been deployed using the ibmcloud cli. For more information see https://cloud.ibm.com/docs/cli?topic=cli-ibmcloud_cli#ibmcloud_login
+
+#### Usage
+
+Assuming the prerequisites have been met, the script can be run by passing the name of the VPC to remove as the only argument. E.g. 
+
+```shell
+./delete-vpc.sh my-vpc
+```
+
+The script will delete all of the resources under the VPC in order then finally delete the VPC instance itself.

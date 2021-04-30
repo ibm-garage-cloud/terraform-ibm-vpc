@@ -106,3 +106,39 @@ resource ibm_is_security_group_rule private_dns_2 {
     port_max = 53
   }
 }
+
+resource ibm_is_security_group_rule internet_access_1 {
+  count = var.provision ? 1 : 0
+
+  group     = local.security_group_id
+  direction = "outbound"
+  remote    = "0.0.0.0/0"
+  tcp {
+    port_min = 80
+    port_max = 80
+  }
+}
+
+resource ibm_is_security_group_rule internet_access_2 {
+  count = var.provision ? 1 : 0
+
+  group     = local.security_group_id
+  direction = "outbound"
+  remote    = "0.0.0.0/0"
+  tcp {
+    port_min = 443
+    port_max = 443
+  }
+}
+
+resource ibm_is_security_group_rule internal_access_1 {
+  count = var.provision ? 1 : 0
+
+  group     = local.security_group_id
+  direction = "outbound"
+  remote    = "10.0.0.0/8"
+  tcp {
+    port_min = 1
+    port_max = 65535
+  }
+}

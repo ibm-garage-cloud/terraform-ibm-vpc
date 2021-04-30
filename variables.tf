@@ -35,3 +35,9 @@ variable "provision" {
   description = "Flag indicating that the instance should be provisioned. If false then an existing instance will be looked up"
   default     = true
 }
+
+variable "flow-log-cos-bucket-name" {
+  type        = string
+  description = "Cloud Object Storage bucket id for flow logs (optional)"
+  default     = ""
+}

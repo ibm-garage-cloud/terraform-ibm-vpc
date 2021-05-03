@@ -107,23 +107,14 @@ resource ibm_is_security_group_rule private_dns_2 {
   }
 }
 
-
-
-resource "ibm_iam_authorization_policy" "policy" {
-  count = length(var.flow-log-cos-bucket-name) > 0 ? 1 : 0
-  source_service_name = "is"
-  source_resource_type = "flow-log-collector"
-  target_service_name = "cloud-object-storage"
-  roles = ["Writer"] 
-}
-
 resource ibm_is_flow_log flowlog_instance {
   count = length(var.flow-log-cos-bucket-name) > 0 ? 1 : 0
   depends_on = [ibm_is_vpc.vpc]
-  name = var.flow-log-cos-bucket-name
+  name = "${local.vpc_name}-flowlog"
   active = true
   //target can be VPC or Virtual Server Instance or Subnet or Primary Network Interface or Secondary Network Interface 
   target = data.ibm_is_vpc.vpc.id
   resource_group = var.resource_group_id
   storage_bucket = var.flow-log-cos-bucket-name
 }
+

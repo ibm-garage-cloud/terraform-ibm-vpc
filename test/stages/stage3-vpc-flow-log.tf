@@ -13,6 +13,11 @@ resource null_resource print_cos_id {
   }
 }
 
+resource "random_string" "random" {
+  length           = 16
+  special          = false
+}
+
 module "dev_cos_bucket" {
   source = "github.com/cloud-native-toolkit/terraform-ibm-object-storage-bucket.git"
 
@@ -20,7 +25,7 @@ module "dev_cos_bucket" {
   cos_instance_id     = module.cos.id
   name_prefix         = var.name_prefix
   ibmcloud_api_key    = var.ibmcloud_api_key
-  name                = "fl-testing"
+  name                = "fl-testing-${random_string.random.value}"
   region              = var.region
 }
 

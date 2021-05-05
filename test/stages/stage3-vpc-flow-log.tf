@@ -48,5 +48,5 @@ module "dev_vpc_with_flowlog" {
   name_prefix         = var.name_prefix
   name                = "vpc-with-fl-${module.cos.name}-${length(null_resource.print_bucket)}"
   ibmcloud_api_key    = var.ibmcloud_api_key
-  flow-log-cos-bucket-name = module.dev_cos_bucket.bucket_name
+  flow_log_cos_bucket_name = module.dev_cos_bucket.bucket_name
 }

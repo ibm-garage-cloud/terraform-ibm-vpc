@@ -88,7 +88,7 @@ resource ibm_is_network_acl network_acl {
     }
   }
 
-  #### ACL Inboud #######
+  ##### ACL Inboud #######
 
   rules {
     name        = "in-acl-http"

@@ -41,3 +41,21 @@ variable "flow_log_cos_bucket_name" {
   description = "Cloud Object Storage bucket id for flow logs (optional)"
   default     = ""
 }
+
+variable "address_prefix_count" {
+  type        = number
+  description = "The number of ipv4_cidr_blocks"
+  default     = 0
+}
+
+variable "address_prefixes" {
+  type        = list(string)
+  description = "List of ipv4 cidr blocks for the address prefixes (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value."
+  default     = []
+}
+
+variable "auth_id" {
+  type        = string
+  description = "The id of the authorization policy that allows the Flow Log to access the Object Storage bucket. This is optional and provided to sequence the authorization before the flow log creation."
+  default     = ""
+}

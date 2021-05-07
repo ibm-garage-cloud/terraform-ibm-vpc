@@ -16,6 +16,9 @@ versions:
         - source: github.com/cloud-native-toolkit/terraform-ibm-object-storage-bucket
           version: ">= 0.0.1"
       optional: true
+    - id: auth
+      refs: []
+      optional: true
   variables:
     - name: resource_group_id
       moduleRef:
@@ -37,4 +40,9 @@ versions:
       moduleRef:
         id: cos_bucket
         output: bucket_name
+      optional: true
+    - name: auth_id
+      moduleRef:
+        id: auth
+        output: id
       optional: true

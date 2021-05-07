@@ -49,3 +49,11 @@ variable "vpc_subnets" {
   description = "JSON representation of list of object, e.g. [{\"label\"=\"default\"}]"
   default     = "[]"
 }
+
+variable "address_prefixes" {
+  default = ""
+}
+
+variable "address_prefix_count" {
+  default = 0
+}

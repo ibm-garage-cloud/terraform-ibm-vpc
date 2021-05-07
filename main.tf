@@ -31,21 +31,140 @@ resource ibm_is_network_acl network_acl {
   resource_group = var.resource_group_id
   vpc            = data.ibm_is_vpc.vpc.id
 
+  ++++++++++
+  
+    #### ACL Outboud #######
   rules {
-    name        = "egress"
+    name        = "eg-acl-http"
     action      = "allow"
-    source      = "0.0.0.0/0"
+    source      = "10.0.0.0/8"
     destination = "0.0.0.0/0"
     direction   = "outbound"
+    tcp {
+      port_max        = 80
+      port_min        = 80
+      source_port_max = 80
+      source_port_min = 80
+    }
+  }
+
+  rules {
+    name        = "eg-acl-https"
+    action      = "allow"
+    source      = "10.0.0.0/8"
+    destination = "0.0.0.0/0"
+    direction   = "outbound"
+    tcp {
+      port_max        = 443
+      port_min        = 443
+      source_port_max = 443
+      source_port_min = 443
+    }
   }
   rules {
-    name        = "ingress"
+    name        = "eg-acl-ssh"
+    action      = "allow"
+    source      = "10.0.0.0/8"
+    destination = "0.0.0.0/0"
+    direction   = "outbound"
+    tcp {
+      port_max        = 22
+      port_min        = 22
+      source_port_max = 22
+      source_port_min = 22
+    }
+  }
+  rules {
+    name        = "eg-acl-ovpn"
+    action      = "allow"
+    source      = "10.0.0.0/8"
+    destination = "0.0.0.0/0"
+    direction   = "outbound"
+    tcp {
+      port_max        = 1194
+      port_min        = 1194
+      source_port_max = 1194
+      source_port_min = 1194
+    }
+  }
+
+  rules {
+    name        = "eg-internal"
+    action      = "allow"
+    source      = "10.0.0.0/8"
+    destination = "10.0.0.0/8"
+    direction   = "outbound"
+  }
+
+    #### ACL Inboud #######
+
+  rules {
+    name        = "in-acl-http"
     action      = "allow"
     source      = "0.0.0.0/0"
-    destination = "0.0.0.0/0"
+    destination = "10.0.0.0/8"
+    direction   = "inbound"
+    tcp {
+      port_max        = 80
+      port_min        = 80
+      source_port_max = 80
+      source_port_min = 80
+    }
+  }
+
+  rules {
+    name        = "in-acl-https"
+    action      = "allow"
+    source      = "0.0.0.0/0"
+    destination = "10.0.0.0/8"
+    direction   = "inbound"
+    tcp {
+      port_max        = 443
+      port_min        = 443
+      source_port_max = 443
+      source_port_min = 443
+    }
+  }
+
+
+  rules {
+    name        = "eg-internal1"
+    action      = "allow"
+    source      = "10.0.0.0/8"
+    destination = "10.0.0.0/8"
     direction   = "inbound"
   }
-}
+
+  rules {
+    name        = "in-acl-ssh"
+    action      = "allow"
+    source      = "0.0.0.0/0"
+    destination = "10.0.0.0/8"
+    direction   = "inbound"
+    tcp {
+      port_max        = 22
+      port_min        = 22
+      source_port_max = 22
+      source_port_min = 22
+
+    }
+  }
+  rules {
+    name        = "in-acl-ovpn"
+    action      = "allow"
+    source      = "0.0.0.0/0"
+    destination = "10.0.0.0/8"
+    direction   = "inbound"
+    tcp {
+      port_max        = 1194
+      port_min        = 1194
+      source_port_max = 1194
+      source_port_min = 1194
+
+    }
+  }
+
+  }
 
 resource ibm_is_security_group_rule rule_icmp_ping {
   count = var.provision ? 1 : 0

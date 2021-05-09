@@ -56,7 +56,7 @@ resource ibm_is_vpc_address_prefix cidr_prefix {
 # arguments.  I suspect this is actually a defect in what is returned from ibm_is_vpc_address_prefix
 # and it may one day be fixed and trip up this code.
 resource null_resource post_vpc_address_pfx_default {
-  count = local.provision_cidr ? var.address_prefix_count : 0
+  count = local.provision_cidr ? 1 : 0
   depends_on = [ibm_is_vpc_address_prefix.cidr_prefix]
 
   provisioner "local-exec" {

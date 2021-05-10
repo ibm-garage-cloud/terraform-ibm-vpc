@@ -21,3 +21,20 @@ output "crn" {
   depends_on  = [null_resource.post_vpc_address_pfx_default]
   description = "The CRN for the vpc instance"
 }
+
+output "count" {
+  value       = 1
+  description = "The number of VPCs created by this module. Always set to 1"
+}
+
+output "names" {
+  value       = [local.vpc_name]
+  depends_on  = [null_resource.post_vpc_address_pfx_default]
+  description = "The name of the vpc instance"
+}
+
+output "ids" {
+  value       = [local.vpc_id]
+  depends_on  = [null_resource.post_vpc_address_pfx_default]
+  description = "The id of the vpc instance"
+}

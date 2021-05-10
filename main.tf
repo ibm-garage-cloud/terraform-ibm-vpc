@@ -2,7 +2,7 @@
 locals {
   tmp_dir           = "${path.cwd}/.tmp"
   zone_count        = 3
-  vpc_zone_names    = [ for index in range(local.zone_count): "${var.region}-${(index % local.zone_count) + 1}" ]
+  vpc_zone_names    = [ for index in range(max(local.zone_count, var.address_prefix_count)): "${var.region}-${(index % local.zone_count) + 1}" ]
   prefix_name       = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
   vpc_name          = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
   vpc_id            = data.ibm_is_vpc.vpc.id

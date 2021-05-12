@@ -36,7 +36,7 @@ fi
 echo "Testing security group rules"
 ibmcloud is security-groups --output JSON | \
   jq --arg VPC_NAME "${VPC_NAME}" '.[] | select(.vpc.name == $VPC_NAME) | .rules[]'
-OPEN_RULES=$(ibmcloud is security-groups --output JSON | jq -c --arg VPC_NAME "${VPC_NAME}" '.[] | select(.vpc.name == $VPC_NAME) | .rules[] | select(.remote.cidr == "0.0.0.0/0")')
+OPEN_RULES=$(ibmcloud is security-groups --output JSON | jq -c --arg VPC_NAME "${VPC_NAME}" '.[] | select(.vpc.name == $VPC_NAME) | .rules[] | select(.remote.cidr_block == "0.0.0.0/0")')
 if [[ -n "${OPEN_RULES}" ]]; then
   echo "Rules found with public internet address"
   echo "${OPEN_RULES}"

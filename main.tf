@@ -60,17 +60,6 @@ resource null_resource post_vpc_address_pfx_default {
   }
 }
 
-resource ibm_is_security_group_rule rule_icmp_ping {
-  count = var.provision ? 1 : 0
-
-  group     = local.security_group_id
-  direction = "inbound"
-  remote    = "0.0.0.0/0"
-  icmp {
-    type = 8
-  }
-}
-
 # from https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
 resource ibm_is_security_group_rule "cse_dns_1" {
   count = var.provision ? 1 : 0

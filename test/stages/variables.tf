@@ -51,7 +51,7 @@ variable "vpc_subnets" {
 }
 
 variable "address_prefixes" {
-  default = ""
+  default = "[]"
 }
 
 variable "address_prefix_count" {

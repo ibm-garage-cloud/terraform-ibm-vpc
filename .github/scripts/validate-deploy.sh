@@ -36,8 +36,7 @@ fi
 SG_NAME="${VPC_NAME}-base"
 
 echo "Testing security group rules"
-ibmcloud is security-groups --output JSON | \
-  jq --arg SG_NAME "${SG_NAME}" '.[] | select(.name == $SG_NAME) | .rules[]'
+ibmcloud is security-groups --output JSON | jq '.[]'
 OPEN_RULES=$(ibmcloud is security-groups --output JSON | jq -c --arg SG_NAME "${SG_NAME}" '.[] | select(.name == $SG_NAME) | .rules[]')
 if [[ -z "${OPEN_RULES}" ]]; then
   echo "No rules found for '${SG_NAME}'"

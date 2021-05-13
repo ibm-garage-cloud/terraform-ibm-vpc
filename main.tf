@@ -78,7 +78,7 @@ resource null_resource print_sg_name {
   depends_on = [data.ibm_is_security_group.base]
 
   provisioner "local-exec" {
-    command = "echo 'SG name: ${local.vpc_name}-base'"
+    command = "echo 'SG name: ${data.ibm_is_vpc.vpc.name}'"
   }
 }
 

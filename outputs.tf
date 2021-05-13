@@ -38,3 +38,8 @@ output "ids" {
   depends_on  = [null_resource.post_vpc_address_pfx_default, ibm_is_vpc.vpc]
   description = "The id of the vpc instance"
 }
+
+output "base_security_group" {
+  value       = data.ibm_is_security_group.base.id
+  description = "The id of the base security group to be shared by other resources. The base group is different from the default security group."
+}

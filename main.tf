@@ -6,7 +6,8 @@ locals {
   prefix_name       = var.name_prefix != "" ? var.name_prefix : var.resource_group_name
   vpc_name          = lower(replace(var.name != "" ? var.name : "${local.prefix_name}-vpc", "_", "-"))
   vpc_id            = data.ibm_is_vpc.vpc.id
-  security_group_id = data.ibm_is_vpc.vpc.default_security_group
+  security_group_count = var.provision ? 2 : 0
+  security_group_ids = var.provision ? [ data.ibm_is_vpc.vpc.default_security_group, ibm_is_security_group.base[0] ] : []
   acl_id            = data.ibm_is_vpc.vpc.default_network_acl
   crn               = data.ibm_is_vpc.vpc.resource_crn
   ipv4_cidr_provided = var.address_prefix_count > 0 && length(var.address_prefixes) >= var.address_prefix_count
@@ -20,9 +21,9 @@ resource ibm_is_vpc vpc {
   name                        = local.vpc_name
   resource_group              = var.resource_group_id
   address_prefix_management   = local.ipv4_cidr_provided ? "manual" : "auto"
-  default_security_group_name = "${local.vpc_name}-security-group"
-  default_network_acl_name    = "${local.vpc_name}-acl"
-  default_routing_table_name  = "${local.vpc_name}-routing"
+  default_security_group_name = "${local.vpc_name}-default"
+  default_network_acl_name    = "${local.vpc_name}-default"
+  default_routing_table_name  = "${local.vpc_name}-default"
 }
 
 data ibm_is_vpc vpc {
@@ -60,11 +61,24 @@ resource null_resource post_vpc_address_pfx_default {
   }
 }
 
-# from https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
-resource ibm_is_security_group_rule "cse_dns_1" {
+resource ibm_is_security_group base {
   count = var.provision ? 1 : 0
 
-  group     = local.security_group_id
+  name = "${local.vpc_name}-base"
+  vpc = data.ibm_is_vpc.vpc.id
+}
+
+data ibm_is_security_group base {
+  depends_on = [ibm_is_security_group.base]
+
+  name = "${local.vpc_name}-base"
+}
+
+# from https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
+resource ibm_is_security_group_rule "cse_dns_1" {
+  count = local.security_group_count
+
+  group     = local.security_group_ids[count.index]
   direction = "outbound"
   remote    = "161.26.0.10"
   udp {
@@ -74,9 +88,9 @@ resource ibm_is_security_group_rule "cse_dns_1" {
 }
 
 resource ibm_is_security_group_rule cse_dns_2 {
-  count = var.provision ? 1 : 0
+  count = local.security_group_count
 
-  group     = local.security_group_id
+  group     = local.security_group_ids[count.index]
   direction = "outbound"
   remote    = "161.26.0.11"
   udp {
@@ -86,9 +100,9 @@ resource ibm_is_security_group_rule cse_dns_2 {
 }
 
 resource ibm_is_security_group_rule private_dns_1 {
-  count = var.provision ? 1 : 0
+  count = local.security_group_count
 
-  group     = local.security_group_id
+  group     = local.security_group_ids[count.index]
   direction = "outbound"
   remote    = "161.26.0.7"
   udp {
@@ -98,9 +112,9 @@ resource ibm_is_security_group_rule private_dns_1 {
 }
 
 resource ibm_is_security_group_rule private_dns_2 {
-  count = var.provision ? 1 : 0
+  count = local.security_group_count
 
-  group     = local.security_group_id
+  group     = local.security_group_ids[count.index]
   direction = "outbound"
   remote    = "161.26.0.8"
   udp {

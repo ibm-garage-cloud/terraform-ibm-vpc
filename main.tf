@@ -65,7 +65,8 @@ resource ibm_is_security_group base {
   count = var.provision ? 1 : 0
 
   name = "${local.vpc_name}-base"
-  vpc = data.ibm_is_vpc.vpc.id
+  vpc  = data.ibm_is_vpc.vpc.id
+  resource_group = var.resource_group_id
 }
 
 data ibm_is_security_group base {

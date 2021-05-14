@@ -5,8 +5,10 @@
 ## set of rules
 
 ACL_ID="$1"
+REGION="$2"
+RESOURCE_GROUP="$3"
 
-# Assume that we are already logged in
+ibmcloud login --apikey "${IBMCLOUD_API_KEY}" -r "${REGION}" -g "${RESOURCE_GROUP}" --quiet
 
 # Install jq if not available
 

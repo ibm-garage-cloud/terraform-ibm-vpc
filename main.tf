@@ -66,7 +66,11 @@ resource null_resource setup_default_acl {
   count = var.provision ? 1 : 0
 
   provisioner "local-exec" {
-    command = "${path.module}/scripts/setup-default-acl.sh ${data.ibm_is_vpc.vpc.default_network_acl}"
+    command = "${path.module}/scripts/setup-default-acl.sh ${data.ibm_is_vpc.vpc.default_network_acl} ${var.region} ${var.resource_group_name}"
+
+    environment = {
+      IBMCLOUD_API_KEY = var.ibmcloud_api_key
+    }
   }
 }
 

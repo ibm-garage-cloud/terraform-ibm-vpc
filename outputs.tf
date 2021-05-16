@@ -43,3 +43,8 @@ output "base_security_group" {
   value       = data.ibm_is_security_group.base.id
   description = "The id of the base security group to be shared by other resources. The base group is different from the default security group."
 }
+
+output "addresses" {
+  value = data.ibm_is_vpc.vpc.cse_source_addresses[*].address
+  description = "The ip address ranges for the VPC"
+}

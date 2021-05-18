@@ -60,19 +60,19 @@ resource null_resource post_vpc_address_pfx_default {
      COMMAND
   }
 }
-
-resource null_resource setup_default_acl {
-  depends_on = [null_resource.post_vpc_address_pfx_default]
-  count = var.provision ? 1 : 0
-
-  provisioner "local-exec" {
-    command = "${path.module}/scripts/setup-default-acl.sh ${data.ibm_is_vpc.vpc.default_network_acl} ${var.region} ${var.resource_group_name}"
-
-    environment = {
-      IBMCLOUD_API_KEY = var.ibmcloud_api_key
-    }
-  }
-}
+//
+//resource null_resource setup_default_acl {
+//  depends_on = [null_resource.post_vpc_address_pfx_default]
+//  count = var.provision ? 1 : 0
+//
+//  provisioner "local-exec" {
+//    command = "${path.module}/scripts/setup-default-acl.sh ${data.ibm_is_vpc.vpc.default_network_acl} ${var.region} ${var.resource_group_name}"
+//
+//    environment = {
+//      IBMCLOUD_API_KEY = var.ibmcloud_api_key
+//    }
+//  }
+//}
 
 resource ibm_is_security_group base {
   count = var.provision ? 1 : 0
@@ -97,7 +97,35 @@ resource null_resource print_sg_name {
 }
 
 # from https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
-resource ibm_is_security_group_rule "cse_dns_1" {
+resource ibm_is_security_group_rule inbound_self {
+  count = local.security_group_count
+
+  group     = local.security_group_ids[count.index]
+  direction = "inbound"
+  remote    = local.security_group_ids[count.index]
+}
+
+resource ibm_is_security_group_rule inbound_ssh {
+  count = local.security_group_count
+
+  group     = local.security_group_ids[count.index]
+  direction = "inbound"
+  remote    = "0.0.0.0/0"
+  tcp {
+    port_min = 22
+    port_max = 22
+  }
+}
+
+resource ibm_is_security_group_rule outbound_all {
+  count = local.security_group_count
+
+  group     = local.security_group_ids[count.index]
+  direction = "outbound"
+  remote    = "0.0.0.0/0"
+}
+
+resource ibm_is_security_group_rule cse_dns_1 {
   count = local.security_group_count
 
   group     = local.security_group_ids[count.index]

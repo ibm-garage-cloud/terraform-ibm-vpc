@@ -39,30 +39,11 @@ resource ibm_is_vpc_address_prefix cidr_prefix {
   zone  = local.vpc_zone_names[count.index]
   vpc   = data.ibm_is_vpc.vpc.id
   cidr  = local.ipv4_cidr_block[count.index]
-}
-
-# Set the address prefixes as the default.  This will allow us to specify the number of ips required
-# in each subnet, instead of figuring out specific cidrs.
-# Note the "split" function call - this is because the id returned from creating the address
-# comes back as <vpc_id>/<address_range_id> and the update call wants these passed as separate
-# arguments.  I suspect this is actually a defect in what is returned from ibm_is_vpc_address_prefix
-# and it may one day be fixed and trip up this code.
-resource null_resource post_vpc_address_pfx_default {
-  count = local.provision_cidr ? 1 : 0
-  depends_on = [ibm_is_vpc_address_prefix.cidr_prefix]
-
-  provisioner "local-exec" {
-    command = <<COMMAND
-      ibmcloud login --apikey ${var.ibmcloud_api_key} -r ${var.region} -g ${var.resource_group_name} --quiet ; \
-      ibmcloud is vpc-address-prefix-update '${local.provision_cidr ? ibm_is_vpc.vpc[0].id : ""}' '${split("/", local.provision_cidr ? ibm_is_vpc_address_prefix.cidr_prefix[0].id : "/")[1]}' --default true ; \
-      ibmcloud is vpc-address-prefix-update '${local.provision_cidr ? ibm_is_vpc.vpc[0].id : ""}' '${split("/", local.provision_cidr ? ibm_is_vpc_address_prefix.cidr_prefix[1].id : "/")[1]}' --default true ; \
-      ibmcloud is vpc-address-prefix-update '${local.provision_cidr ? ibm_is_vpc.vpc[0].id : ""}' '${split("/", local.provision_cidr ? ibm_is_vpc_address_prefix.cidr_prefix[2].id : "/")[1]}' --default true ; \
-     COMMAND
-  }
+  is_default = count.index < local.zone_count
 }
 
 resource null_resource setup_default_acl {
-  depends_on = [null_resource.post_vpc_address_pfx_default]
+  depends_on = [ibm_is_vpc.vpc]
   count = var.provision ? 1 : 0
 
   provisioner "local-exec" {

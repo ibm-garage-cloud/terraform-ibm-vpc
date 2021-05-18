@@ -20,7 +20,7 @@ ibmcloud is network-acl "${ACL_ID}" --output JSON | \
   jq -r '.rules[].id' | \
   while read rule_id;
 do
-  ibmcloud network-acl-rule-delete "${ACL_ID}" "${rule_id}"
+  echo y | ibmcloud is network-acl-rule-delete "${ACL_ID}" "${rule_id}"
 done
 
 ibmcloud is network-acl-rule-add "${ACL_ID}" allow inbound all 10.0.0.0/8 10.0.0.0/8 --name allow-internal-ingress

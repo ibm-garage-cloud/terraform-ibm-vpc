@@ -20,7 +20,7 @@ resource ibm_is_vpc vpc {
 
   name                        = local.vpc_name
   resource_group              = var.resource_group_id
-  address_prefix_management   = local.ipv4_cidr_provided ? "manual" : "auto"
+  address_prefix_management   = local.ipv4_cidr_provided ? "manual" : null
   default_security_group_name = "${local.vpc_name}-default"
   default_network_acl_name    = "${local.vpc_name}-default"
   default_routing_table_name  = "${local.vpc_name}-default"

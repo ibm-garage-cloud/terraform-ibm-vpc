@@ -78,7 +78,7 @@ resource null_resource print_sg_name {
 }
 
 # from https://cloud.ibm.com/docs/vpc?topic=vpc-service-endpoints-for-vpc
-resource ibm_is_security_group_rule "cse_dns_1" {
+resource ibm_is_security_group_rule cse_dns_1 {
   count = local.security_group_count
 
   group     = local.security_group_ids[count.index]
@@ -124,4 +124,20 @@ resource ibm_is_security_group_rule private_dns_2 {
     port_min = 53
     port_max = 53
   }
+}
+
+resource ibm_is_security_group_rule inbound_self {
+  count = local.security_group_count
+
+  group     = local.security_group_ids[count.index]
+  direction = "inbound"
+  remote    = local.security_group_ids[count.index]
+}
+
+resource ibm_is_security_group_rule outbound_self {
+  count = local.security_group_count
+
+  group     = local.security_group_ids[count.index]
+  direction = "outbound"
+  remote    = local.security_group_ids[count.index]
 }

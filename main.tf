@@ -44,7 +44,7 @@ resource ibm_is_vpc_address_prefix cidr_prefix {
 
 resource null_resource setup_default_acl {
   depends_on = [ibm_is_vpc.vpc]
-  count = var.provision ? 1 : 0
+  count = false && var.provision ? 1 : 0
 
   provisioner "local-exec" {
     command = "${path.module}/scripts/setup-default-acl.sh ${data.ibm_is_vpc.vpc.default_network_acl} ${var.region} ${var.resource_group_name}"

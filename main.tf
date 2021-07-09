@@ -13,6 +13,7 @@ locals {
   ipv4_cidr_provided = var.address_prefix_count > 0 && length(var.address_prefixes) >= var.address_prefix_count
   ipv4_cidr_block    = local.ipv4_cidr_provided ? var.address_prefixes : [ for val in range(var.address_prefix_count): "" ]
   provision_cidr     = var.provision && local.ipv4_cidr_provided
+  base_security_group_name = var.base_security_group_name != null && var.base_security_group_name != "" ? var.base_security_group_name : "${local.vpc_name}-base"
 }
 
 resource ibm_is_vpc vpc {
@@ -58,7 +59,7 @@ resource null_resource setup_default_acl {
 resource ibm_is_security_group base {
   count = var.provision ? 1 : 0
 
-  name = "${local.vpc_name}-base"
+  name = local.base_security_group_name
   vpc  = data.ibm_is_vpc.vpc.id
   resource_group = var.resource_group_id
 }
@@ -66,14 +67,14 @@ resource ibm_is_security_group base {
 data ibm_is_security_group base {
   depends_on = [ibm_is_security_group.base]
 
-  name = "${local.vpc_name}-base"
+  name = local.base_security_group_name
 }
 
 resource null_resource print_sg_name {
   depends_on = [data.ibm_is_security_group.base]
 
   provisioner "local-exec" {
-    command = "echo 'SG name: ${data.ibm_is_security_group.base.name}'"
+    command = "echo 'SG name: ${data.ibm_is_security_group.base.name != null ? data.ibm_is_security_group.base.name : "null"}'"
   }
 }
 

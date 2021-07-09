@@ -48,3 +48,9 @@ variable "address_prefixes" {
   description = "List of ipv4 cidr blocks for the address prefixes (e.g. ['10.10.10.0/24']). If you are providing cidr blocks then a value must be provided for each of the subnets. If you don't provide cidr blocks for each of the subnets then values will be generated using the {ipv4_address_count} value."
   default     = []
 }
+
+variable "base_security_group_name" {
+  type        = string
+  description = "The name of the base security group. If not provided the name will be based on the vpc name"
+  default     = ""
+}

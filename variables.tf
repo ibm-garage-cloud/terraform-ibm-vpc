@@ -3,6 +3,7 @@ variable "resource_group_id" {
   type        = string
   description = "The id of the IBM Cloud resource group where the VPC instance will be created."
 }
+
 variable "resource_group_name" {
   type        = string
   description = "The name of the IBM Cloud resource group where the VPC instance will be created."
